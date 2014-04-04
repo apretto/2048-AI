@@ -203,7 +203,8 @@ AI.prototype.search = function(depth, alpha, beta, positions, cutoffs) {
 
 // performs a search and returns the best move
 AI.prototype.getBest = function() {
-  return this.iterativeDeep();
+  //return this.iterativeDeep();
+  return this.fixedDeep(1);
 }
 
 // performs iterative deepening over the alpha-beta search
@@ -226,6 +227,14 @@ AI.prototype.iterativeDeep = function() {
   //console.log(best);
   return best
 }
+
+AI.prototype.fixedDeep = function (depth) {
+  var searchDepth;
+  searchDepth = depth || 0;
+
+  return this.search(searchDepth, -10000, 10000, 0 ,0);
+};
+
 
 AI.prototype.translate = function(move) {
  return {
