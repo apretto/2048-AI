@@ -26,7 +26,6 @@ Grid.prototype.buildIndexes = function () {
 // Build a grid of the specified size
 Grid.prototype.build = function () {
   var x, y;
-  this.buildIndexes();
 
   for (x = 0; x < this.size; x++) {
     var row = this.cells[x] = [];
@@ -188,7 +187,7 @@ Grid.prototype.move = function (direction) {
   // Traverse the grid in the right direction and move tiles
   traversals.x.forEach(function (x) {
     traversals.y.forEach(function (y) {
-      cell = self.indexes[x][y];
+      cell = {x: x, y: y};
       tile = self.cellContent(cell);
 
       if (tile) {
@@ -384,11 +383,11 @@ Grid.prototype.smoothness = function() {
   var smoothness = 0;
   for (var x=0; x<this.size; x++) {
     for (var y=0; y<this.size; y++) {
-      if ( this.cellOccupied( this.indexes[x][y] )) {
-        var value = Math.log(this.cellContent( this.indexes[x][y] ).value) / Math.log(2);
+      if ( this.cellOccupied( {x: x, y: y} )) {
+        var value = Math.log(this.cellContent( {x: x, y: y} ).value) / Math.log(2);
         for (var direction=1; direction<=2; direction++) {
           var vector = this.getVector(direction);
-          var targetCell = this.findFarthestPosition(this.indexes[x][y], vector).next;
+          var targetCell = this.findFarthestPosition({x: x, y: y}, vector).next;
 
           if (this.cellOccupied(targetCell)) {
             var target = this.cellContent(targetCell);
@@ -482,15 +481,15 @@ Grid.prototype.monotonicity2 = function() {
     var current = 0;
     var next = current+1;
     while ( next<this.size ) {
-      while ( next<this.size && !this.cellOccupied( this.indexes[x][next] )) {
+      while ( next<this.size && !this.cellOccupied( {x: x, y: next} )) {
         next++;
       }
       if (next>=this.size) { next--; }
       var currentValue = this.cellOccupied({x:x, y:current}) ?
-        Math.log(this.cellContent( this.indexes[x][current] ).value) / Math.log(2) :
+        Math.log(this.cellContent( {x: x, y: current} ).value) / Math.log(2) :
         0;
       var nextValue = this.cellOccupied({x:x, y:next}) ?
-        Math.log(this.cellContent( this.indexes[x][next] ).value) / Math.log(2) :
+        Math.log(this.cellContent( {x: x, y: next} ).value) / Math.log(2) :
         0;
       if (currentValue > nextValue) {
         totals[0] += nextValue - currentValue;
@@ -507,15 +506,15 @@ Grid.prototype.monotonicity2 = function() {
     var current = 0;
     var next = current+1;
     while ( next<this.size ) {
-      while ( next<this.size && !this.cellOccupied( this.indexes[next][y] )) {
+      while ( next<this.size && !this.cellOccupied( {x: next, y: y} )) {
         next++;
       }
       if (next>=this.size) { next--; }
       var currentValue = this.cellOccupied({x:current, y:y}) ?
-        Math.log(this.cellContent( this.indexes[current][y] ).value) / Math.log(2) :
+        Math.log(this.cellContent( {x: current, y: y} ).value) / Math.log(2) :
         0;
       var nextValue = this.cellOccupied({x:next, y:y}) ?
-        Math.log(this.cellContent( this.indexes[next][y] ).value) / Math.log(2) :
+        Math.log(this.cellContent( {x: next, y: y} ).value) / Math.log(2) :
         0;
       if (currentValue > nextValue) {
         totals[2] += nextValue - currentValue;
@@ -534,8 +533,8 @@ Grid.prototype.maxValue = function() {
   var max = 0;
   for (var x=0; x<this.size; x++) {
     for (var y=0; y<this.size; y++) {
-      if (this.cellOccupied(this.indexes[x][y])) {
-        var value = this.cellContent(this.indexes[x][y]).value;
+      if (this.cellOccupied({x: x, y: y})) {
+        var value = this.cellContent({x: x, y: y}).value;
         if (value > max) {
           max = value;
         }
@@ -556,8 +555,8 @@ Grid.prototype.valueSum = function() {
 
   for (var x=0; x<this.size; x++) {
     for (var y=0; y<this.size; y++) {
-      if (this.cellOccupied(this.indexes[x][y])) {
-        valueCount[Math.log(this.cellContent(this.indexes[x][y]).value) / Math.log(2)]++;
+      if (this.cellOccupied({x: x, y: y})) {
+        valueCount[Math.log(this.cellContent({x: x, y: y}).value) / Math.log(2)]++;
       }
     }
   }
@@ -576,8 +575,8 @@ Grid.prototype.isWin = function() {
   var self = this;
   for (var x=0; x<this.size; x++) {
     for (var y=0; y<this.size; y++) {
-      if (self.cellOccupied(this.indexes[x][y])) {
-        if (self.cellContent(this.indexes[x][y]).value == 9007199254740992) {
+      if (self.cellOccupied({x: x, y: y})) {
+        if (self.cellContent({x: x, y: y}).value == 9007199254740992) {
           return true;
         }
       }
